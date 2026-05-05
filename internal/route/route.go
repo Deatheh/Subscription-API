@@ -7,6 +7,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+const (
+	SubscriptionRoute       = "/subscription"
+	SubscriptionRouteWithId = "/subscription:id"
+)
+
 type Handler struct {
 	services *service.Service
 	envConf  *config.Config
@@ -18,6 +23,5 @@ func NewRouter(services *service.Service, envConf *config.Config) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	r := gin.Default()
-
 	return r
 }

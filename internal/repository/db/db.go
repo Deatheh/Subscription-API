@@ -5,6 +5,8 @@ import (
 	"subscription/internal/config"
 
 	"github.com/jmoiron/sqlx"
+
+	_ "github.com/lib/pq"
 )
 
 type DatabaseRepository struct {
