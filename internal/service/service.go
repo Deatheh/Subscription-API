@@ -2,12 +2,20 @@ package service
 
 import (
 	"subscription/internal/config"
+	"subscription/internal/entities"
 	"subscription/internal/repository"
 )
 
-type Service struct {
+type Subscription interface {
+	Add(subscription *entities.Subscription) (*entities.Subscription, error)
 }
 
-func NewService(repository *repository.Repository, envConf *config.Config) *Service {
-	return &Service{}
+type Service struct {
+	Subscription
+}
+
+func NewService(repo *repository.Repository, envConf *config.Config) *Service {
+	return &Service{
+		Subscription: &SubscriptionService{repository: repo.DatabaseRepository},
+	}
 }
