@@ -1,8 +1,13 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"subscription/internal/config"
+	"subscription/internal/repository"
+	"subscription/internal/repository/db"
+	"subscription/internal/route"
+	"subscription/internal/service"
 
 	"github.com/joho/godotenv"
 )
@@ -13,4 +18,18 @@ func main() {
 	}
 	envConf := config.NewEnvConfig()
 	config.PrintConfigWithHiddenSecrets(envConf)
+
+	dbRepo, err := db.NewDatabaseInstance(envConf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer dbRepo.Close()
+
+	repository := &repository.Repository{DatabaseRepository: dbRepo}
+	services := service.NewService(repository, envConf)
+	handlers := route.NewRouter(services, envConf)
+
+	if err := handlers.InitRoutes().Run(fmt.Sprintf(":%v", envConf.Application.Port)); err != nil {
+		log.Fatal(fmt.Errorf("server run error: %w", err))
+	}
 }
