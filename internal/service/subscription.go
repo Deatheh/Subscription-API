@@ -28,3 +28,41 @@ func (sub *SubscriptionService) Add(subscription *entities.Subscription) (*entit
 	}
 	return outSubscription, nil
 }
+
+func (sub *SubscriptionService) GetAll() (*[]entities.Subscription, error) {
+	subscriptionSlice, err := sub.repository.GetAllSubscription()
+	if err != nil {
+		return nil, err
+	}
+	for i := 0; i < len(*subscriptionSlice); i++ {
+		(*subscriptionSlice)[i].StartDate, err = utils.DateToMonthYear((*subscriptionSlice)[i].StartDate)
+		if err != nil {
+			return nil, err
+		}
+		if (*subscriptionSlice)[i].EndDate != "" {
+			(*subscriptionSlice)[i].EndDate, err = utils.DateToMonthYear((*subscriptionSlice)[i].EndDate)
+			if err != nil {
+				return nil, err
+			}
+		}
+	}
+	return subscriptionSlice, nil
+}
+
+func (sub *SubscriptionService) GetById(id int) (*entities.Subscription, error) {
+	outSubscription, err := sub.repository.GetSubscriptionById(id)
+	if err != nil {
+		return nil, err
+	}
+	outSubscription.StartDate, err = utils.DateToMonthYear(outSubscription.StartDate)
+	if err != nil {
+		return nil, err
+	}
+	if outSubscription.EndDate != "" {
+		outSubscription.EndDate, err = utils.DateToMonthYear(outSubscription.EndDate)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return outSubscription, nil
+}

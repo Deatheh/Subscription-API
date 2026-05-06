@@ -8,6 +8,8 @@ import (
 
 type Subscription interface {
 	Add(subscription *entities.Subscription) (*entities.Subscription, error)
+	GetAll() (*[]entities.Subscription, error)
+	GetById(id int) (*entities.Subscription, error)
 }
 
 type Service struct {

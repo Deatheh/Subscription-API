@@ -10,7 +10,7 @@ import (
 
 const (
 	SubscriptionRoute       = "/subscription"
-	SubscriptionRouteWithId = "/subscription:id"
+	SubscriptionRouteWithId = "/subscription/:id"
 )
 
 type Handler struct {
@@ -28,6 +28,8 @@ func (h *Handler) InitRoutes() *gin.Engine {
 	{
 		subscr.Use(logger.RequestLogger("subscription"))
 		subscr.POST(SubscriptionRoute, h.AddSubscription)
+		subscr.GET(SubscriptionRoute, h.GetAllSubscription)
+		subscr.GET(SubscriptionRouteWithId, h.GetSubscriptionById)
 	}
 
 	return r

@@ -3,6 +3,7 @@ package route
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 
 	"github.com/ashwingopalsamy/uuidcheck"
 	"github.com/gin-gonic/gin"
@@ -119,4 +120,68 @@ func (h *Handler) AddSubscription(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, outSubscription)
 	log.Info().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusCreated).
 		Msg("successful adding subscription")
+}
+
+func (h *Handler) GetAllSubscription(ctx *gin.Context) {
+	log.Debug().Msg("call h.services.Subscription.GetAll")
+	outSubscriptionSlice, err := h.services.Subscription.GetAll()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("error getting all subscriptions: %s", err.Error())})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusInternalServerError).
+			Msgf("error getting all subscriptions: %s", err.Error())
+		return
+	}
+
+	if len(*outSubscriptionSlice) == 0 {
+		ctx.JSON(http.StatusNoContent, "")
+		log.Info().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusOK).
+			Msg("successful getting all subscriptions, but finding 0 rows")
+		return
+	}
+
+	ctx.JSON(http.StatusOK, outSubscriptionSlice)
+	log.Info().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusOK).
+		Msg("successful getting all subscriptions")
+}
+
+func (h *Handler) GetSubscriptionById(ctx *gin.Context) {
+	idStr := ctx.Param("id")
+	if idStr == "" {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error parsing user data: empty id"})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
+			Msg("error parsing user data: empty id")
+		return
+	}
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error parsing user data: count is not a number"})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
+			Msg("error parsing user data: count is not a number")
+		return
+	}
+	if id < 1 {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error parsing user data: invalid id"})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
+			Msg("error parsing user data: invalid id")
+		return
+	}
+
+	log.Debug().Msg("call h.services.Subscription.GetById")
+	outSubscription, err := h.services.Subscription.GetById(id)
+	if err != nil {
+		if err.Error() == "Subscription.GetById: sql: no rows in result set" {
+			ctx.JSON(http.StatusNotFound, gin.H{"error": "error getting subscription by id: id not founded"})
+			log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusNotFound).
+				Msg("error getting subscription by id: id not founded")
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("error getting subscription by id: %s", err.Error())})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusInternalServerError).
+			Msgf("error getting subscription by id: %s", err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, outSubscription)
+	log.Info().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusOK).
+		Msg("successful getting subscription by id")
 }

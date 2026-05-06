@@ -18,6 +18,10 @@ up:
 down: 
 	docker compose -f $(COMPOSE_FILE) down
 
+.PHONY: stop
+stop: 
+	docker compose -f $(COMPOSE_FILE) stop
+
 .PHONY: reset
 reset:
 	docker compose -f $(COMPOSE_FILE) down -v
