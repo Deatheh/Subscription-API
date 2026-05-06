@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/ashwingopalsamy/uuidcheck"
 	"github.com/gin-gonic/gin"
 	"github.com/rs/zerolog/log"
 
@@ -52,13 +53,18 @@ func (h *Handler) AddSubscription(ctx *gin.Context) {
 			Msg("error getting request data: empty user uuid")
 		return
 	}
+	if !uuidcheck.IsValidUUID(dpo.UserUUID) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error getting request data: not valid user uuid"})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
+			Msg("error getting request data: not valid user uuid")
+		return
+	}
 	if dpo.StartDate == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error getting request data: empty start date"})
 		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
 			Msg("error getting request data: empty start date")
 		return
 	}
-
 	if !utils.IsValidMonthYear(dpo.StartDate) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error getting request data: wrong type start date"})
 		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
@@ -70,6 +76,13 @@ func (h *Handler) AddSubscription(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error getting request data: wrong type end date"})
 		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
 			Msg("error getting request data: wrong type end date")
+		return
+	}
+
+	if dpo.EndDate != "" && !utils.IsValidMonthYearLength(dpo.StartDate, dpo.EndDate) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error getting request data: the end date is earlier than the start date"})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
+			Msg("error getting request data: the end date is earlier than the start date")
 		return
 	}
 

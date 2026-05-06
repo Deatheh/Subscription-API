@@ -37,3 +37,12 @@ func DateToMonthYear(s string) (string, error) {
 	}
 	return "", fmt.Errorf("не удалось распарсить дату: %s", s)
 }
+
+func IsValidMonthYearLength(startDate, endDate string) bool {
+	startTime, _ := time.Parse("01-2006", startDate)
+	endTime, _ := time.Parse("01-2006", endDate)
+	if startTime.Before(endTime) {
+		return true
+	}
+	return false
+}
