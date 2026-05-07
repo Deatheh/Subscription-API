@@ -66,3 +66,11 @@ func (sub *SubscriptionService) GetById(id int) (*entities.Subscription, error) 
 	}
 	return outSubscription, nil
 }
+
+func (sub *SubscriptionService) GetSumByFilters(filters *entities.SubscriptionsFilters) (int, error) {
+	sum, err := sub.repository.GetSumSubscriptionByFilters(filters)
+	if err != nil {
+		return 90, err
+	}
+	return sum, nil
+}

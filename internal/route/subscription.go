@@ -185,3 +185,42 @@ func (h *Handler) GetSubscriptionById(ctx *gin.Context) {
 	log.Info().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusOK).
 		Msg("successful getting subscription by id")
 }
+
+func (h *Handler) GetSumSubscriptionByFilters(ctx *gin.Context) {
+	var filters entities.SubscriptionsFilters
+	filters.ServiceName = ctx.Query("service_name")
+	filters.UserUUID = ctx.Query("user_id")
+	StartDateStr := ctx.Query("start_date")
+	StartDate, err := utils.MonthYearToDate(StartDateStr)
+	if StartDateStr != "" && err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error getting request data: wrong type start date"})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
+			Msg("error getting request data: wrong type start date")
+		return
+	}
+	filters.StartDate = StartDate
+
+	EndDateStr := ctx.Query("end_date")
+	EndDate, err := utils.MonthYearToDate(EndDateStr)
+	if EndDateStr != "" && err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error getting request data: wrong type end date"})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusBadRequest).
+			Msg("error getting request data: wrong type end date")
+		return
+	}
+	filters.EndDate = EndDate
+
+	log.Debug().Msg("call h.services.Subscription.GetSumByFilters")
+	var amount entities.SubscriptionAmount
+	amount.Amount, err = h.services.Subscription.GetSumByFilters(&filters)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("error getting sum subscriptions by filters: %s", err.Error())})
+		log.Error().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusInternalServerError).
+			Msgf("error getting all subscriptions: %s", err.Error())
+		return
+	}
+
+	ctx.JSON(http.StatusOK, amount)
+	log.Info().Str("method", ctx.Request.Method).Str("url", ctx.Request.URL.String()).Int("status", http.StatusOK).
+		Msg("successful getting sum subscriptions by filters")
+}

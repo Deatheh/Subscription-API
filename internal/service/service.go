@@ -10,6 +10,7 @@ type Subscription interface {
 	Add(subscription *entities.Subscription) (*entities.Subscription, error)
 	GetAll() (*[]entities.Subscription, error)
 	GetById(id int) (*entities.Subscription, error)
+	GetSumByFilters(filters *entities.SubscriptionsFilters) (int, error)
 }
 
 type Service struct {

@@ -92,3 +92,34 @@ func (dbr *DatabaseRepository) GetSubscriptionById(id int) (*entities.Subscripti
 
 	return &sub, nil
 }
+
+func (dbr *DatabaseRepository) GetSumSubscriptionByFilters(filters *entities.SubscriptionsFilters) (int, error) {
+
+	selectQuery := `
+		SELECT SUM(price) AS sum_price
+		FROM subscription
+		WHERE 1=1`
+
+	var sum int
+	if filters.ServiceName != "" {
+		selectQuery += fmt.Sprintf(" AND name = '%s'", filters.ServiceName)
+	}
+
+	if filters.UserUUID != "" {
+		selectQuery += fmt.Sprintf(" AND user_uuid = '%s'", filters.UserUUID)
+	}
+
+	if filters.StartDate != "" {
+		selectQuery += fmt.Sprintf(" AND date_start >= '%s'", filters.StartDate)
+	}
+
+	if filters.EndDate != "" {
+		selectQuery += fmt.Sprintf(" AND date_end <= '%s'", filters.EndDate)
+	}
+
+	err := dbr.DB.QueryRow(selectQuery).Scan(&sum)
+	if err != nil {
+		return 0, fmt.Errorf("Subscription.GetSumByFilters: %v", err)
+	}
+	return sum, nil
+}

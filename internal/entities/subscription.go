@@ -8,3 +8,14 @@ type Subscription struct {
 	StartDate   string `json:"start_date"`
 	EndDate     string `json:"end_date"`
 }
+
+type SubscriptionsFilters struct {
+	ServiceName string `json:"service_name"`
+	UserUUID    string `json:"user_id"`
+	StartDate   string `json:"start_date"`
+	EndDate     string `json:"end_date"`
+}
+
+type SubscriptionAmount struct {
+	Amount int `json:"amount"`
+}
