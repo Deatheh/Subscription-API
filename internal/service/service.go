@@ -11,6 +11,8 @@ type Subscription interface {
 	GetAll() (*[]entities.Subscription, error)
 	GetById(id int) (*entities.Subscription, error)
 	GetSumByFilters(filters *entities.SubscriptionsFilters) (int, error)
+	Update(subscription *entities.Subscription) (*entities.Subscription, error)
+	Delete(id int) error
 }
 
 type Service struct {

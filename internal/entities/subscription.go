@@ -1,7 +1,7 @@
 package entities
 
 type Subscription struct {
-	Id          string `json:"id"`
+	Id          int    `json:"id"`
 	ServiceName string `json:"service_name"`
 	Price       int    `json:"price"`
 	UserUUID    string `json:"user_id"`

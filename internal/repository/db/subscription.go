@@ -123,3 +123,46 @@ func (dbr *DatabaseRepository) GetSumSubscriptionByFilters(filters *entities.Sub
 	}
 	return sum, nil
 }
+
+func (dbr *DatabaseRepository) UpdateSubscription(sub *entities.Subscription) (*entities.Subscription, error) {
+	var endDate interface{}
+	if sub.EndDate == "" {
+		endDate = nil
+	} else {
+		endDate = sub.EndDate
+	}
+
+	updateQuery := `
+		UPDATE subscription 
+		SET name = $1, price = $2, user_uuid = $3, date_start = $4, date_end = $5
+		WHERE id = $6
+		RETURNING id, name, price, user_uuid, date_start, date_end;
+	`
+
+	var scannedEndDate sql.NullString
+	err := dbr.DB.QueryRow(updateQuery, sub.ServiceName, sub.Price, sub.UserUUID, sub.StartDate, endDate, sub.Id).Scan(
+		&sub.Id, &sub.ServiceName, &sub.Price, &sub.UserUUID, &sub.StartDate, &scannedEndDate)
+	if err != nil {
+		return nil, fmt.Errorf("Subscription.Update: %v", err)
+	}
+	if scannedEndDate.Valid {
+		sub.EndDate = scannedEndDate.String
+	} else {
+		sub.EndDate = ""
+	}
+
+	return sub, nil
+}
+
+func (dbr *DatabaseRepository) DeleteSubscription(id int) error {
+
+	deleteQuery := `
+		DELETE FROM subscription WHERE id = $1;
+	`
+
+	_, err := dbr.DB.Exec(deleteQuery, id)
+	if err != nil {
+		return fmt.Errorf("Subscription.Delete: %v", err)
+	}
+	return nil
+}

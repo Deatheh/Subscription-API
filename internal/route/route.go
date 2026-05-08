@@ -31,7 +31,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		subscr.POST(SubscriptionRoute, h.AddSubscription)
 		subscr.GET(SubscriptionRoute, h.GetAllSubscription)
 		subscr.GET(SubscriptionRouteWithId, h.GetSubscriptionById)
+		subscr.PUT(SubscriptionRouteWithId, h.UpdateSubscription)
+		subscr.DELETE(SubscriptionRouteWithId, h.DeleteSubscription)
 		subscr.GET(SubscriptionGetSumByFiltersRoute, h.GetSumSubscriptionByFilters)
+
 	}
 
 	return r

@@ -74,3 +74,29 @@ func (sub *SubscriptionService) GetSumByFilters(filters *entities.SubscriptionsF
 	}
 	return sum, nil
 }
+
+func (sub *SubscriptionService) Update(subscription *entities.Subscription) (*entities.Subscription, error) {
+	outSubscription, err := sub.repository.UpdateSubscription(subscription)
+	if err != nil {
+		return nil, err
+	}
+	outSubscription.StartDate, err = utils.DateToMonthYear(outSubscription.StartDate)
+	if err != nil {
+		return nil, err
+	}
+	if outSubscription.EndDate != "" {
+		outSubscription.EndDate, err = utils.DateToMonthYear(outSubscription.EndDate)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return outSubscription, nil
+}
+
+func (sub *SubscriptionService) Delete(id int) error {
+	err := sub.repository.DeleteSubscription(id)
+	if err != nil {
+		return err
+	}
+	return nil
+}
