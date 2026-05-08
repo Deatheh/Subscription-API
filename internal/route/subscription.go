@@ -21,7 +21,17 @@ type DPOSubscription struct {
 	EndDate     string `json:"end_date"`
 }
 
-func (h *Handler) AddSubscription(ctx *gin.Context) {
+// HandleAddSubscription
+// @Tags         Subscription
+// @Summary      Добавление записи о подписке
+// @Accept       json
+// @Produce      json
+// @Param        data body DPOSubscription true "Данные записи подписки"
+// @Success      201 {object} entities.Subscription "Успешный ответ"
+// @Failure      400 {object} entities.ErrorResponse "Некорректный запрос"
+// @Failure      500 {object} entities.ErrorResponse "Ошибка на стороне сервера"
+// @Router       /subscription [post]
+func (h *Handler) HandleAddSubscription(ctx *gin.Context) {
 	var dpo DPOSubscription
 	err := ctx.BindJSON(&dpo)
 	if err != nil {
@@ -122,7 +132,17 @@ func (h *Handler) AddSubscription(ctx *gin.Context) {
 		Msg("successful adding subscription")
 }
 
-func (h *Handler) GetAllSubscription(ctx *gin.Context) {
+// HandleGetAllSubscription
+// @Tags         Subscription
+// @Summary      Вывести все записи о подписках
+// @Accept       json
+// @Produce      json
+// @Success      200 {object} []entities.Subscription "Успешный ответ"
+// @Success      204 "Успешный ответ. Пустая база данных"
+// @Failure      400 {object} entities.ErrorResponse "Некорректный запрос"
+// @Failure      500 {object} entities.ErrorResponse "Ошибка на стороне сервера"
+// @Router       /subscription [get]
+func (h *Handler) HandleGetAllSubscription(ctx *gin.Context) {
 	log.Debug().Msg("call h.services.Subscription.GetAll")
 	outSubscriptionSlice, err := h.services.Subscription.GetAll()
 	if err != nil {
@@ -144,7 +164,18 @@ func (h *Handler) GetAllSubscription(ctx *gin.Context) {
 		Msg("successful getting all subscriptions")
 }
 
-func (h *Handler) GetSubscriptionById(ctx *gin.Context) {
+// HandleGetSubscriptionById
+// @Tags         Subscription
+// @Summary      Вывести запись о подписке по id
+// @Accept       json
+// @Produce      json
+// @Param        id  path      int true "ID записи о подписки" example(1)
+// @Success      200 {object} entities.Subscription "Успешный ответ"
+// @Failure      400 {object} entities.ErrorResponse "Некорректный запрос"
+// @Failure      404 {object} entities.ErrorResponse "Запись не найдена"
+// @Failure      500 {object} entities.ErrorResponse "Ошибка на стороне сервера"
+// @Router       /subscription/{id} [get]
+func (h *Handler) HandleGetSubscriptionById(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	if idStr == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error parsing user data: empty id"})
@@ -186,7 +217,20 @@ func (h *Handler) GetSubscriptionById(ctx *gin.Context) {
 		Msg("successful getting subscription by id")
 }
 
-func (h *Handler) GetSumSubscriptionByFilters(ctx *gin.Context) {
+// HandleGetSumSubscriptionByFilters
+// @Tags         Subscription
+// @Summary      Сумма подписок по фильтрам
+// @Accept       json
+// @Produce      json
+// @Param        service_name query string false "Название сервиса"
+// @Param        user_id query string false "UUID пользователя"
+// @Param        start_date query string false "Дата начала (формат: MM-YYYY)"
+// @Param        end_date query string false "Дата окончания (формат: MM-YYYY)"
+// @Success      200 {object} entities.SubscriptionAmount "Успешный ответ"
+// @Failure      400 {object} entities.ErrorResponse "Некорректный запрос"
+// @Failure      500 {object} entities.ErrorResponse "Ошибка на стороне сервера"
+// @Router       /subscription/filters [get]
+func (h *Handler) HandleGetSumSubscriptionByFilters(ctx *gin.Context) {
 	var filters entities.SubscriptionsFilters
 	filters.ServiceName = ctx.Query("service_name")
 	filters.UserUUID = ctx.Query("user_id")
@@ -225,7 +269,19 @@ func (h *Handler) GetSumSubscriptionByFilters(ctx *gin.Context) {
 		Msg("successful getting sum subscriptions by filters")
 }
 
-func (h *Handler) UpdateSubscription(ctx *gin.Context) {
+// HandleUpdateSubscription
+// @Tags         Subscription
+// @Summary      Изменить запись о подписке
+// @Accept       json
+// @Produce      json
+// @Param        id  path      int true "ID записи о подписки" example(1)
+// @Param        data body DPOSubscription true "Данные редактируемого записи"
+// @Success      200 {object} entities.Subscription "Успешный ответ"
+// @Failure      400 {object} entities.ErrorResponse "Некорректный запрос"
+// @Failure      404 {object} entities.ErrorResponse "Запись не найдена"
+// @Failure      500 {object} entities.ErrorResponse "Ошибка на стороне сервера"
+// @Router       /subscription/{id} [put]
+func (h *Handler) HandleUpdateSubscription(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	if idStr == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error parsing user data: empty id"})
@@ -363,7 +419,18 @@ func (h *Handler) UpdateSubscription(ctx *gin.Context) {
 		Msg("successful updateting subscription")
 }
 
-func (h *Handler) DeleteSubscription(ctx *gin.Context) {
+// HandleDeleteSubscription
+// @Tags         Subscription
+// @Summary      Удалить запись о подписке
+// @Accept       json
+// @Produce      json
+// @Param        id  path      int true "ID записи о подписки" example(1)
+// @Success      200 {object} entities.Message "Успешный ответ"
+// @Failure      400 {object} entities.ErrorResponse "Некорректный запрос"
+// @Failure      404 {object} entities.ErrorResponse "Запись не найдена"
+// @Failure      500 {object} entities.ErrorResponse "Ошибка на стороне сервера"
+// @Router       /subscription/{id} [delete]
+func (h *Handler) HandleDeleteSubscription(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	if idStr == "" {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": "error parsing user data: empty id"})

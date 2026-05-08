@@ -1,0 +1,248 @@
+basePath: /
+definitions:
+  entities.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  entities.Message:
+    properties:
+      message:
+        type: string
+    type: object
+  entities.Subscription:
+    properties:
+      end_date:
+        type: string
+      id:
+        type: integer
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+  entities.SubscriptionAmount:
+    properties:
+      amount:
+        type: integer
+    type: object
+  route.DPOSubscription:
+    properties:
+      end_date:
+        type: string
+      price:
+        type: integer
+      service_name:
+        type: string
+      start_date:
+        type: string
+      user_id:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  title: Subscription API
+  version: "1.0"
+paths:
+  /subscription:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            items:
+              $ref: '#/definitions/entities.Subscription'
+            type: array
+        "204":
+          description: Успешный ответ. Пустая база данных
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "500":
+          description: Ошибка на стороне сервера
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+      summary: Вывести все записи о подписках
+      tags:
+      - Subscription
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Данные записи подписки
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/route.DPOSubscription'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Успешный ответ
+          schema:
+            $ref: '#/definitions/entities.Subscription'
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "500":
+          description: Ошибка на стороне сервера
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+      summary: Добавление записи о подписке
+      tags:
+      - Subscription
+  /subscription/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID записи о подписки
+        example: 1
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            $ref: '#/definitions/entities.Message'
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "404":
+          description: Запись не найдена
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "500":
+          description: Ошибка на стороне сервера
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+      summary: Удалить запись о подписке
+      tags:
+      - Subscription
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID записи о подписки
+        example: 1
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            $ref: '#/definitions/entities.Subscription'
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "404":
+          description: Запись не найдена
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "500":
+          description: Ошибка на стороне сервера
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+      summary: Вывести запись о подписке по id
+      tags:
+      - Subscription
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: ID записи о подписки
+        example: 1
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Данные редактируемого записи
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/route.DPOSubscription'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            $ref: '#/definitions/entities.Subscription'
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "404":
+          description: Запись не найдена
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "500":
+          description: Ошибка на стороне сервера
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+      summary: Изменить запись о подписке
+      tags:
+      - Subscription
+  /subscription/filters:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Название сервиса
+        in: query
+        name: service_name
+        type: string
+      - description: UUID пользователя
+        in: query
+        name: user_id
+        type: string
+      - description: 'Дата начала (формат: MM-YYYY)'
+        in: query
+        name: start_date
+        type: string
+      - description: 'Дата окончания (формат: MM-YYYY)'
+        in: query
+        name: end_date
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            $ref: '#/definitions/entities.SubscriptionAmount'
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+        "500":
+          description: Ошибка на стороне сервера
+          schema:
+            $ref: '#/definitions/entities.ErrorResponse'
+      summary: Сумма подписок по фильтрам
+      tags:
+      - Subscription
+swagger: "2.0"

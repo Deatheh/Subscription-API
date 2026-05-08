@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	_ "subscription/docs"
 	"subscription/internal/config"
 	"subscription/internal/repository"
 	"subscription/internal/repository/db"
@@ -12,6 +13,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title Subscription API
+// @version 1.0
+// @host localhost:8080
+// @BasePath /
 func main() {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Println("No .env file found")

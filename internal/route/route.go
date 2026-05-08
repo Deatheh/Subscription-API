@@ -6,12 +6,15 @@ import (
 	"subscription/internal/service"
 
 	"github.com/gin-gonic/gin"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 const (
 	SubscriptionRoute                = "/subscription"
 	SubscriptionRouteWithId          = "/subscription/:id"
 	SubscriptionGetSumByFiltersRoute = "/subscription/filters"
+	SwaggerRoute                     = "/swagger/*any"
 )
 
 type Handler struct {
@@ -25,15 +28,16 @@ func NewRouter(services *service.Service, envConf *config.Config) *Handler {
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	r := gin.Default()
+	r.GET(SwaggerRoute, ginSwagger.WrapHandler(swaggerfiles.Handler))
 	subscr := r.Group("")
 	{
 		subscr.Use(logger.RequestLogger("subscription"))
-		subscr.POST(SubscriptionRoute, h.AddSubscription)
-		subscr.GET(SubscriptionRoute, h.GetAllSubscription)
-		subscr.GET(SubscriptionRouteWithId, h.GetSubscriptionById)
-		subscr.PUT(SubscriptionRouteWithId, h.UpdateSubscription)
-		subscr.DELETE(SubscriptionRouteWithId, h.DeleteSubscription)
-		subscr.GET(SubscriptionGetSumByFiltersRoute, h.GetSumSubscriptionByFilters)
+		subscr.POST(SubscriptionRoute, h.HandleAddSubscription)
+		subscr.GET(SubscriptionRoute, h.HandleGetAllSubscription)
+		subscr.GET(SubscriptionRouteWithId, h.HandleGetSubscriptionById)
+		subscr.PUT(SubscriptionRouteWithId, h.HandleUpdateSubscription)
+		subscr.DELETE(SubscriptionRouteWithId, h.HandleDeleteSubscription)
+		subscr.GET(SubscriptionGetSumByFiltersRoute, h.HandleGetSumSubscriptionByFilters)
 
 	}
 
