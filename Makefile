@@ -54,3 +54,7 @@ migrate-down:
 .PHONY: migrate-reset
 migrate-reset:
 	docker run --rm --network subscription_default -v ./internal/repository/db/migrations:/migrations migrate/migrate:v4.18.1 -path $(MIGRATIONS_PATH) -database "$(DATABASE_URL)" down -all
+
+.PHONY: swagger-update
+swagger-update:
+	swag init -g cmd/app/main.go -o ./docs
